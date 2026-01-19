@@ -1,0 +1,130 @@
+/* ===== Inspector Panel ===== */
+#inspector {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#inspector.visible {
+  display: flex;
+}
+
+.inspector-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #555;
+}
+
+.inspector-header h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 14px;
+}
+
+.inspector-badge {
+  background: #66a;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 10px;
+}
+
+/* Inspector row for each property */
+.inspector-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.inspector-row label {
+  margin: 0;
+  font-size: 11px;
+  color: #aaa;
+  font-weight: bold;
+}
+
+.inspector-row input,
+.inspector-row select {
+  font-size: 11px;
+  padding: 4px;
+}
+
+.inspector-row.group {
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+}
+
+.inspector-row.group label {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.inspector-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.inspector-value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inspector-value label {
+  font-size: 10px;
+  color: #999;
+}
+
+.inspector-value input {
+  font-size: 10px;
+  padding: 2px 4px;
+}
+
+.value-display {
+  background: #3a3a3a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: #aaa;
+  font-family: monospace;
+}
+
+/* Inspector actions */
+.inspector-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #555;
+}
+
+.inspector-actions button {
+  font-size: 11px;
+  padding: 6px;
+}
+
+.inspector-actions .duplicate {
+  background: #555;
+  border-color: #777;
+}
+
+.inspector-actions .delete {
+  background: #a33;
+  border-color: #c55;
+}
+
+.inspector-actions .delete:hover {
+  background: #b44;
+}
+
+/* No selection message */
+.inspector-empty {
+  color: #999;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 12px;
+}

@@ -1,0 +1,73 @@
+/* ===== Accordion ===== */
+.accordion {
+  border: 1px solid #555;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.accordion-header {
+  background: #444;
+  padding: 12px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.accordion-header:hover {
+  background: #555;
+}
+
+.accordion-header::after {
+  content: '▼';
+  font-size: 10px;
+  transition: transform 0.3s;
+  transform: rotate(-90deg);
+}
+
+.accordion.active .accordion-header {
+  background: #555;
+}
+
+.accordion.active .accordion-header::after {
+  transform: rotate(0deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background: #3a3a3a;
+}
+
+.accordion.active .accordion-content {
+  max-height: 1000px;
+  transition: max-height 0.3s ease-in;
+}
+
+.accordion-content > div {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== Section within accordion ===== */
+.accordion-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accordion-section h4 {
+  margin: 0;
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

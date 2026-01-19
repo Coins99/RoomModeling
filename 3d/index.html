@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Room Designer</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Canvas Container -->
+    <div id="canvas-container"></div>
+    
+    <!-- UI Panel -->
+    <div id="ui-panel">
+      <!-- Room Controls -->
+      <div class="accordion active">
+        <div class="accordion-header">Room Settings</div>
+        <div class="accordion-content">
+          <div>
+            <div class="form-group">
+              <label>Width (m)</label>
+              <input type="number" id="roomWidth" value="6" min="2" max="20" step="0.5">
+            </div>
+            <div class="form-group">
+              <label>Depth (m)</label>
+              <input type="number" id="roomDepth" value="5" min="2" max="20" step="0.5">
+            </div>
+            <div class="form-group">
+              <label>Height (m)</label>
+              <input type="number" id="roomHeight" value="3" min="2" max="10" step="0.5">
+            </div>
+            <button id="buildRoomBtn" class="primary">Update Room</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials -->
+      <div class="accordion">
+        <div class="accordion-header">Materials & Colors</div>
+        <div class="accordion-content">
+          <div>
+            <div class="form-group">
+              <label>Floor Color</label>
+              <input type="color" id="floorColor" value="#888888">
+            </div>
+            <div class="form-group">
+              <label>Wall Color</label>
+              <input type="color" id="wallColor" value="#cccccc">
+            </div>
+            <div class="form-group">
+              <label>Ceiling Color</label>
+              <input type="color" id="ceilingColor" value="#ffffff">
+            </div>
+            <div class="form-group">
+              <label>Texture Preview</label>
+              <div id="texture-preview" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="texture-option" data-texture="none">None</button>
+                <button class="texture-option" data-texture="grid">Grid</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Furniture -->
+      <div class="accordion">
+        <div class="accordion-header">Furniture</div>
+        <div class="accordion-content">
+          <div>
+            <div class="button-group">
+              <button id="addBoxBtn" class="primary">Add Box</button>
+              <button id="addSphereBtn" class="primary">Add Sphere</button>
+            </div>
+            <div class="button-group">
+              <button id="addChairBtn" class="primary">Add Chair</button>
+              <button id="clearFurnitureBtn" class="danger">Clear All</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Objects -->
+      <div class="accordion">
+        <div class="accordion-header">Custom Object</div>
+        <div class="accordion-content">
+          <div>
+            <div class="form-group">
+              <label>Object Type</label>
+              <select id="objType">
+                <option value="box">Box</option>
+                <option value="sphere">Sphere</option>
+                <option value="cylinder">Cylinder</option>
+                <option value="cone">Cone</option>
+              </select>
+            </div>
+            
+            <div data-param-type="box" style="display: block;">
+              <div class="form-row three">
+                <div class="form-group">
+                  <label>Width (m)</label>
+                  <input type="number" id="boxWidth" value="1" min="0.1" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Height (m)</label>
+                  <input type="number" id="boxHeight" value="1" min="0.1" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Depth (m)</label>
+                  <input type="number" id="boxDepth" value="1" min="0.1" step="0.1">
+                </div>
+              </div>
+            </div>
+
+            <div data-param-type="sphere" style="display: none;">
+              <div class="form-group">
+                <label>Radius (m)</label>
+                <input type="number" id="sphereRadius" value="0.5" min="0.1" step="0.1">
+              </div>
+            </div>
+
+            <div data-param-type="cylinder" style="display: none;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Radius (m)</label>
+                  <input type="number" id="cylinderRadius" value="0.5" min="0.1" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Height (m)</label>
+                  <input type="number" id="cylinderHeight" value="2" min="0.1" step="0.1">
+                </div>
+              </div>
+            </div>
+
+            <div data-param-type="cone" style="display: none;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Radius (m)</label>
+                  <input type="number" id="coneRadius" value="0.5" min="0.1" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Height (m)</label>
+                  <input type="number" id="coneHeight" value="2" min="0.1" step="0.1">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <input type="color" id="customColor" value="#ff6600">
+            </div>
+            
+            <button id="createObj" class="primary">Create Object</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera -->
+      <div class="accordion">
+        <div class="accordion-header">Camera</div>
+        <div class="accordion-content">
+          <div>
+            <div class="form-group">
+              <label>Camera Mode: <span id="cameraModeLabel">Orbit</span></label>
+              <button id="toggleCameraBtn" class="primary">Switch to FPS</button>
+            </div>
+            <div class="form-group">
+              <label>Mouse Sensitivity</label>
+              <input type="range" id="mouseSensitivity" min="0.1" max="2" step="0.1" value="1">
+              <span id="sensitivityValue">1.0</span>
+            </div>
+            <div class="form-group">
+              <label>Movement Speed</label>
+              <input type="range" id="movementSpeed" min="0.5" max="3" step="0.1" value="1">
+              <span id="speedValue">1.0</span>
+            </div>
+            <div class="form-group">
+              <label>Zoom (Orbit)</label>
+              <input type="range" id="zoomSpeed" min="0.5" max="3" step="0.1" value="1">
+              <span id="zoomValue">1.0</span>
+            </div>
+            <button id="resetCamBtn" class="primary">Reset Camera</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Snapping & Grid -->
+      <div class="accordion">
+        <div class="accordion-header">Snapping & Grid</div>
+        <div class="accordion-content">
+          <div>
+            <div class="form-group">
+              <label>Grid Snap Size (m)</label>
+              <input type="range" id="snapSize" min="0.05" max="1" step="0.05" value="0.25">
+              <span id="snapSizeValue">0.25</span>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="enableSnapping"> Enable Grid Snapping
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="enableRotationSnapping"> Enable 45° Rotation Snapping
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inspector -->
+      <div id="inspector">
+        <div class="inspector-header">
+          <h3>Inspector</h3>
+          <span class="inspector-badge" id="selectedType"></span>
+        </div>
+        <div id="selectedInfo"></div>
+        <div id="inspectorContent"></div>
+        <div class="inspector-actions">
+          <button id="duplicateBtn" class="duplicate">Duplicate</button>
+          <button id="deleteBtn" class="delete">Delete</button>
+        </div>
+      </div>
+
+      <!-- History/Undo -->
+      <div class="accordion">
+        <div class="accordion-header">History</div>
+        <div class="accordion-content">
+          <div>
+            <div class="button-group">
+              <button id="undoBtn" class="primary">Undo (Ctrl+Z)</button>
+              <button id="redoBtn" class="primary">Redo (Ctrl+Y)</button>
+            </div>
+            <div id="historyList" style="font-size: 11px; color: #aaa; max-height: 150px; overflow-y: auto;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save/Load -->
+      <div class="accordion">
+        <div class="accordion-header">Save & Load</div>
+        <div class="accordion-content">
+          <div>
+            <div class="button-group full">
+              <button id="saveBtn" class="primary">Save Scene (.json)</button>
+              <button id="loadBtn" class="primary">Load Scene (.json)</button>
+              <button id="loadAutoSave" class="primary">Load Auto-Save</button>
+              <button id="exportImg" class="primary">Export Screenshot</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help -->
+      <div class="accordion">
+        <div class="accordion-header">Keyboard Shortcuts</div>
+        <div class="accordion-content">
+          <div style="font-size: 11px; line-height: 1.6; color: #bbb;">
+            <p><strong>Camera:</strong><br>
+            F - Toggle FPS mode<br>
+            WASD - Move (FPS)<br>
+            Mouse - Look around (FPS)<br>
+            Scroll - Zoom (Orbit)<br></p>
+            <p><strong>Transforms:</strong><br>
+            W - Translate mode<br>
+            E - Rotate mode<br>
+            R - Scale mode<br></p>
+            <p><strong>General:</strong><br>
+            Ctrl+Z - Undo<br>
+            Ctrl+Y - Redo<br>
+            Delete - Remove selected<br></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- App Initialization -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
