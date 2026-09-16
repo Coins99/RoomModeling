@@ -61,10 +61,10 @@ function setupTransforms(appState) {
 
 function setupCustomObjects() {
   const objType = document.getElementById("objType");
-  const boxParams = document.getElementById("boxParams");
-  const sphereParams = document.getElementById("sphereParams");
-  const cylinderParams = document.getElementById("cylinderParams");
-  const coneParams = document.getElementById("coneParams");
+  const boxParams = document.querySelector('[data-param-type="box"]');
+  const sphereParams = document.querySelector('[data-param-type="sphere"]');
+  const cylinderParams = document.querySelector('[data-param-type="cylinder"]');
+  const coneParams = document.querySelector('[data-param-type="cone"]');
 
   objType.addEventListener("change", () => {
     boxParams.style.display = objType.value === "box" ? "block" : "none";
