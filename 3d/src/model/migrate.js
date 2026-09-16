@@ -15,16 +15,19 @@ function normalizeColor(value, fallback) {
   return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback;
 }
 
-function legacyDimensions(item) {
+function legacyDimensions(item, kind, usesStandardBoxDimensions) {
   const scale = item.scale ?? {};
   const x = Math.abs(numberOr(scale.x, 1));
   const y = Math.abs(numberOr(scale.y, 1));
   const z = Math.abs(numberOr(scale.z, 1));
 
-  if (item.type === 'sphere') {
+  if (kind === 'box' && usesStandardBoxDimensions) {
+    return { width: 1000 * x, depth: 600 * z, height: 500 * y };
+  }
+  if (kind === 'sphere') {
     return { width: 700 * x, depth: 700 * z, height: 700 * y };
   }
-  if (item.type === 'chair') {
+  if (kind === 'chair') {
     return { width: 600 * x, depth: 600 * z, height: 900 * y };
   }
   return { width: 1000 * x, depth: 1000 * z, height: 1000 * y };
@@ -46,12 +49,14 @@ function migrateLegacy(document) {
   migrated.objects = (Array.isArray(document.furniture) ? document.furniture : []).map((item) => {
     const position = item.position ?? {};
     const rotation = item.rotation ?? {};
+    const name = String(item.name ?? '').trim();
     const nameKind = ['box', 'sphere', 'chair', 'cylinder', 'cone']
-      .find((kind) => String(item.name ?? '').toLowerCase().startsWith(kind));
+      .find((kind) => name.toLowerCase().startsWith(kind));
     const knownKind = ['box', 'sphere', 'chair', 'cylinder', 'cone'].includes(item.type)
       ? item.type
       : nameKind ?? 'box';
-    const dimensions = legacyDimensions({ ...item, type: knownKind });
+    const usesStandardBoxDimensions = item.type === 'box' || /^box\s+\d+$/i.test(name);
+    const dimensions = legacyDimensions(item, knownKind, usesStandardBoxDimensions);
     const rendererY = numberOr(position.y, knownKind === 'chair' ? 0 : dimensions.height / 2000);
     const baseY = knownKind === 'chair'
       ? metresToMillimetres(rendererY)

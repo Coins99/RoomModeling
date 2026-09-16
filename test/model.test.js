@@ -17,9 +17,9 @@ test('legacy metre-based saves migrate to canonical millimetres', () => {
     room: { width: 4.2, depth: 3.5, height: 2.4 },
     materials: { floor: '112233', wall: '#abcdef', ceiling: '#ffffff' },
     furniture: [{
-      uuid: 'desk-1',
-      name: 'Desk',
-      type: 'box',
+      uuid: 'box-1',
+      name: 'Box 1',
+      type: 'unknown',
       position: { x: 1.25, y: 0.4, z: -0.5 },
       rotation: { x: 0.1, y: Math.PI / 2, z: 0 },
       scale: { x: 1.2, y: 0.75, z: 0.6 },
@@ -28,15 +28,34 @@ test('legacy metre-based saves migrate to canonical millimetres', () => {
   });
 
   assert.equal(migrated.room.width, 4200);
-  assert.deepEqual(migrated.objects[0].dimensions, { width: 1200, depth: 600, height: 750 });
+  assert.deepEqual(migrated.objects[0].dimensions, { width: 1200, depth: 360, height: 375 });
   assert.deepEqual(migrated.objects[0].transform, {
     x: 1250,
-    y: 25,
+    y: 212.5,
     z: -500,
     rotationY: Math.PI / 2,
   });
   assert.deepEqual(migrated.objects[0].legacyTilt, { x: 0.1, z: 0 });
   assert.equal(validateDocument(migrated).valid, true);
+});
+
+test('legacy unknown custom objects retain the unit-cube fallback', () => {
+  const migrated = migrateDocument({
+    version: '1.0',
+    room: { width: 6, depth: 5, height: 3 },
+    furniture: [{
+      uuid: 'custom-1',
+      name: 'Custom Object',
+      type: 'unknown',
+      position: { x: 0, y: 0.5, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+      scale: { x: 2, y: 0.5, z: 0.75 },
+      color: '#ffffff',
+    }],
+  });
+
+  assert.deepEqual(migrated.objects[0].dimensions, { width: 2000, depth: 750, height: 500 });
+  assert.equal(migrated.objects[0].transform.y, 250);
 });
 
 test('validation rejects duplicate IDs and non-finite geometry', () => {

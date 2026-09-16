@@ -71,7 +71,7 @@ Manual save, autosave and history share the same serializer. Renderer factories 
 
 ## Implementation status
 
-R1, canonical scene model and deterministic persistence, is in progress. Nine deterministic tests cover schema validation, legacy migration, semantic round trips, coordinate conversion, scale handling and renderer reconstruction. All JavaScript files also pass syntax checking.
+R1, canonical scene model and deterministic persistence, is in progress. Ten deterministic tests cover schema validation, legacy migration, semantic round trips, coordinate conversion, scale handling and renderer reconstruction. All JavaScript files also pass syntax checking.
 
 Remaining R1 work includes browser coverage for every furniture and opening factory, rollback verification for renderer failures, measured repeated-load resource checks and routing every editing operation through document commands. Dimension-aware editing, precision placement, spatial validation and linked floor-plan/3D editing follow in later milestones.
 
