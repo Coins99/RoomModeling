@@ -1,10 +1,17 @@
 import * as CONST from '../../core/constants.js';
+import { createId, metresToMillimetres } from '../../model/document.js';
 
 export function buildRoomAssets(appState, width, depth, height) {
   const { THREE, roomAssets } = appState;
   const assets = CONST.ROOM_ASSETS;
   
-  while (roomAssets.children.length) roomAssets.remove(roomAssets.children[0]);
+  while (roomAssets.children.length) {
+    const object = roomAssets.children[0];
+    roomAssets.remove(object);
+    object.geometry?.dispose?.();
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    materials.filter(Boolean).forEach((material) => material.dispose?.());
+  }
 
   // Ceiling fixture
   const fixtureGeom = new THREE.CylinderGeometry(assets.fixture.radius, assets.fixture.radius, assets.fixture.height, 32);
@@ -47,6 +54,17 @@ export function addDoor(appState) {
   const b = appState.room.userData.bounds || CONST.DEFAULT_ROOM;
   doorMesh.position.set(0, door.height/2, b.depth/2 - door.thickness/2 - 0.01);
   doorMesh.userData.wall = 'front';
+  doorMesh.userData.opening = {
+    id: createId('door'),
+    kind: 'door',
+    wall: 'front',
+    offset: metresToMillimetres((b.width - door.width) / 2),
+    width: metresToMillimetres(door.width),
+    height: metresToMillimetres(door.height),
+    hingeSide: 'left',
+    swingDirection: 'inward',
+    swingAngle: Math.PI / 2,
+  };
   roomAssets.add(doorMesh);
   appState.saveState('Add Door');
 }
@@ -68,6 +86,15 @@ export function addWindow(appState) {
   windowMesh.position.set(b.width/2 - window_.width/2 - 0.1, (b.height||3) * 0.65, -b.depth/4);
   windowMesh.rotation.y = Math.PI / 2;
   windowMesh.userData.wall = 'right';
+  windowMesh.userData.opening = {
+    id: createId('window'),
+    kind: 'window',
+    wall: 'right',
+    offset: metresToMillimetres((3 * b.depth) / 4 - window_.width / 2),
+    width: metresToMillimetres(window_.width),
+    height: metresToMillimetres(window_.height),
+    elevation: metresToMillimetres((b.height || 3) * 0.65),
+  };
   roomAssets.add(windowMesh);
   appState.saveState('Add Window');
 }

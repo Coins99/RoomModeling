@@ -1,5 +1,18 @@
 import * as CONST from '../../core/constants.js';
+import { createId, metresToMillimetres } from '../../model/document.js';
 import { clampToRoom } from '../room/room.js';
+
+function markModelObject(object, kind, width, depth, height) {
+  object.userData.modelId = createId('object');
+  object.userData.kind = kind;
+  object.userData.dimensionsMm = {
+    width: metresToMillimetres(width),
+    depth: metresToMillimetres(depth),
+    height: metresToMillimetres(height),
+  };
+  object.userData.modelScale = { x: object.scale.x, y: object.scale.y, z: object.scale.z };
+  object.userData.locked = false;
+}
 
 export function addBox(appState) {
   const { THREE, furniture, transformControls } = appState;
@@ -11,6 +24,7 @@ export function addBox(appState) {
   m.name = 'Box ' + (furniture.children.length + 1);
   m.castShadow = true;
   m.receiveShadow = true;
+  markModelObject(m, 'box', sizes.width, sizes.depth, sizes.height);
   m.position.set((Math.random()-0.5)*3, 0.25, (Math.random()-0.5)*3);
   clampToRoom(appState, m.position);
   furniture.add(m);
@@ -30,6 +44,7 @@ export function addSphere(appState) {
   m.name = 'Sphere ' + (furniture.children.length + 1);
   m.castShadow = true;
   m.receiveShadow = true;
+  markModelObject(m, 'sphere', radius * 2, radius * 2, radius * 2);
   m.position.set((Math.random()-0.5)*3, radius, (Math.random()-0.5)*3);
   clampToRoom(appState, m.position);
   furniture.add(m);
@@ -76,6 +91,7 @@ export function addChair(appState) {
   
   chairGroup.add(seat);
   chairGroup.add(back);
+  markModelObject(chairGroup, 'chair', chair.width, chair.depth, 0.9);
   chairGroup.position.set((Math.random()-0.5)*3, 0, (Math.random()-0.5)*3);
   clampToRoom(appState, chairGroup.position);
   furniture.add(chairGroup);
@@ -88,27 +104,32 @@ export function addChair(appState) {
 export function createCustomObject(appState) {
   const { THREE, furniture, transformControls } = appState;
   
-  const name = document.getElementById("objName").value || "Custom Object";
+  const name = `${document.getElementById("objType").value} object`;
   const type = document.getElementById("objType").value;
-  const color = document.getElementById("objColor").value;
+  const color = document.getElementById("customColor").value;
 
   let geom;
+  let dimensions;
   if (type === "box") {
-    const w = parseFloat(document.getElementById("boxW").value) || 1;
-    const h = parseFloat(document.getElementById("boxH").value) || 1;
-    const d = parseFloat(document.getElementById("boxD").value) || 1;
+    const w = parseFloat(document.getElementById("boxWidth").value) || 1;
+    const h = parseFloat(document.getElementById("boxHeight").value) || 1;
+    const d = parseFloat(document.getElementById("boxDepth").value) || 1;
     geom = new THREE.BoxGeometry(w, h, d);
+    dimensions = { width: w, depth: d, height: h };
   } else if (type === "sphere") {
-    const r = parseFloat(document.getElementById("sphereR").value) || 0.5;
+    const r = parseFloat(document.getElementById("sphereRadius").value) || 0.5;
     geom = new THREE.SphereGeometry(r, 32, 16);
+    dimensions = { width: r * 2, depth: r * 2, height: r * 2 };
   } else if (type === "cylinder") {
-    const r = parseFloat(document.getElementById("cylR").value) || 0.5;
-    const h = parseFloat(document.getElementById("cylH").value) || 1;
+    const r = parseFloat(document.getElementById("cylinderRadius").value) || 0.5;
+    const h = parseFloat(document.getElementById("cylinderHeight").value) || 1;
     geom = new THREE.CylinderGeometry(r, r, h, 32);
+    dimensions = { width: r * 2, depth: r * 2, height: h };
   } else if (type === "cone") {
-    const r = parseFloat(document.getElementById("coneR").value) || 0.5;
-    const h = parseFloat(document.getElementById("coneH").value) || 1;
+    const r = parseFloat(document.getElementById("coneRadius").value) || 0.5;
+    const h = parseFloat(document.getElementById("coneHeight").value) || 1;
     geom = new THREE.ConeGeometry(r, h, 32);
+    dimensions = { width: r * 2, depth: r * 2, height: h };
   }
 
   const mat = new THREE.MeshStandardMaterial({ color });
@@ -117,6 +138,7 @@ export function createCustomObject(appState) {
   obj.castShadow = true; 
   obj.receiveShadow = true;
   obj.position.set(0, geom.parameters.height ? geom.parameters.height/2 : 0.5, 0);
+  markModelObject(obj, type, dimensions.width, dimensions.depth, dimensions.height);
   clampToRoom(appState, obj.position);
 
   furniture.add(obj);

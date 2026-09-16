@@ -1,9 +1,14 @@
 import * as CONST from '../../core/constants.js';
+import { createId } from '../../model/document.js';
 import { clampToRoom } from '../room/room.js';
 
 export function setupInspector(appState) {
+  appState.updateInspector = () => updateInspector(appState);
+  appState.updateSelectedInfo = () => updateSelectedInfo(appState);
   setupInspectorUI(appState);
   setupInspectorActions(appState);
+  appState.updateInspector();
+  appState.updateSelectedInfo();
 }
 
 function setupInspectorUI(appState) {
@@ -13,7 +18,8 @@ function setupInspectorUI(appState) {
 function setupInspectorActions(appState) {
   const { furniture, transformControls } = appState;
   
-  document.getElementById('deleteObj').addEventListener('click', () => {
+  const deleteButton = document.getElementById('deleteObj') || document.getElementById('deleteBtn');
+  deleteButton?.addEventListener('click', () => {
     if (appState.selected) {
       furniture.remove(appState.selected);
       transformControls.detach();
@@ -25,11 +31,14 @@ function setupInspectorActions(appState) {
     }
   });
 
-  document.getElementById('duplicateObj').addEventListener('click', () => {
+  const duplicateButton = document.getElementById('duplicateObj') || document.getElementById('duplicateBtn');
+  duplicateButton?.addEventListener('click', () => {
     if (appState.selected) {
       const clone = appState.selected.clone();
       clone.position.x += 0.5;
       clone.name = appState.selected.name + ' Copy';
+      clone.userData = structuredClone(appState.selected.userData);
+      clone.userData.modelId = createId('object');
       furniture.add(clone);
       appState.setSelected(clone);
       transformControls.attach(clone);
@@ -42,21 +51,23 @@ function setupInspectorActions(appState) {
 export function updateSelectedInfo(appState) {
   const nameEl = document.getElementById('selectedName');
   const typeEl = document.getElementById('selectedType');
-  
+  const actions = document.getElementById('inspectorActions') || document.querySelector('.inspector-actions');
+
   if (appState.selected) {
-    nameEl.textContent = appState.selected.name || 'Unnamed Object';
-    typeEl.textContent = `${appState.selected.geometry.type} • ${appState.selected.uuid.substring(0,8)}`;
-    document.getElementById('inspectorActions').style.display = 'block';
+    if (nameEl) nameEl.textContent = appState.selected.name || 'Unnamed Object';
+    const type = appState.selected.userData.kind || appState.selected.geometry?.type || appState.selected.type;
+    if (typeEl) typeEl.textContent = `${type} • ${(appState.selected.userData.modelId || appState.selected.uuid).substring(0, 8)}`;
+    if (actions) actions.style.display = 'flex';
   } else {
-    nameEl.textContent = 'None';
-    typeEl.textContent = 'Click an object to select';
-    document.getElementById('inspectorActions').style.display = 'none';
+    if (nameEl) nameEl.textContent = 'None';
+    if (typeEl) typeEl.textContent = 'Click an object to select';
+    if (actions) actions.style.display = 'none';
   }
 }
 
 export function updateInspector(appState) {
   const { selected, transformControls, THREE } = appState;
-  const inspector = document.getElementById('inspector');
+  const inspector = document.getElementById('inspectorContent') || document.getElementById('inspector');
   
   inspector.innerHTML = '';
   if (!selected) {

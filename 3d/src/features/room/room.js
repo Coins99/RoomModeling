@@ -1,6 +1,10 @@
 import * as CONST from '../../core/constants.js';
 import { buildRoomAssets } from './assets.js';
 
+function disposeRoomMesh(object) {
+  object.geometry?.dispose?.();
+}
+
 export function setupRoom(appState) {
   const buildRoomBtn = document.getElementById('buildRoomBtn');
   
@@ -17,6 +21,7 @@ export function setupRoom(appState) {
   
   // Attach buildRoom to appState
   appState.buildRoom = (w, d, h) => buildRoom(appState, w, d, h);
+  buildRoom(appState);
 }
 
 export function buildRoom(appState, width = CONST.DEFAULT_ROOM.width, depth = CONST.DEFAULT_ROOM.depth, height = CONST.DEFAULT_ROOM.height) {
@@ -24,9 +29,13 @@ export function buildRoom(appState, width = CONST.DEFAULT_ROOM.width, depth = CO
   
   room.children
     .filter(c => c !== roomAssets)
-    .forEach(c => room.remove(c));
+    .forEach(c => {
+      room.remove(c);
+      disposeRoomMesh(c);
+    });
 
-  document.getElementById('roomSize').textContent = (width * depth * height).toFixed(1);
+  const roomSize = document.getElementById('roomSize');
+  if (roomSize) roomSize.textContent = (width * depth * height).toFixed(1);
 
   // Floor
   const floorGeom = new THREE.PlaneGeometry(width, depth);
