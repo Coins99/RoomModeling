@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "units": "millimetres",
+  "coordinateSystem": {
+    "upAxis": "y",
+    "floorPlane": "xz",
+    "origin": "room-centre-floor",
+    "objectOrigin": "footprint-centre-base",
+    "rotationUnit": "radians",
+    "wallOffsetDirections": {
+      "front": "left-to-right",
+      "right": "front-to-back",
+      "back": "right-to-left",
+      "left": "back-to-front"
+    }
+  },
+  "room": {
+    "id": "room",
+    "width": 6000,
+    "depth": 5000,
+    "height": 3000,
+    "wallThickness": 0,
+    "materials": {
+      "floor": "#8b6b4b",
+      "wall": "#f0f0f0",
+      "ceiling": "#ffffff"
+    },
+    "openings": []
+  },
+  "objects": [
+    {
+      "id": "desk",
+      "kind": "box",
+      "name": "Desk",
+      "dimensions": {
+        "width": 1600,
+        "depth": 750,
+        "height": 750
+      },
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "z": -1500,
+        "rotationY": 0
+      },
+      "material": {
+        "color": "#9c7957"
+      },
+      "locked": false
+    },
+    {
+      "id": "chair",
+      "kind": "chair",
+      "name": "Desk chair",
+      "dimensions": {
+        "width": 600,
+        "depth": 600,
+        "height": 900
+      },
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "z": -500,
+        "rotationY": 3.141592653589793
+      },
+      "material": {
+        "color": "#3b5368"
+      },
+      "locked": false
+    },
+    {
+      "id": "cabinet",
+      "kind": "box",
+      "name": "Low cabinet",
+      "dimensions": {
+        "width": 450,
+        "depth": 1400,
+        "height": 650
+      },
+      "transform": {
+        "x": 2300,
+        "y": 0,
+        "z": 600,
+        "rotationY": 0
+      },
+      "material": {
+        "color": "#d1ba96"
+      },
+      "locked": false
+    }
+  ],
+  "preferences": {
+    "displayUnits": "metric",
+    "gridStep": 250
+  }
+}
